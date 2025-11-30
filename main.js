@@ -17,16 +17,16 @@ window.addEventListener('load', () => {
             progress = 100;
             clearInterval(loadingInterval);
             
-     setTimeout(() => {
-    loader.classList.add('hidden');
-    document.body.style.overflow = 'visible';
-    initAnimations();
-    
-    // 🎯 SKILL BARS FIX - ADD THIS CALL
-    setTimeout(() => {
-        animateSkillBars();
-    }, 200);
-}, 500);
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                document.body.style.overflow = 'visible';
+                initAnimations();
+                
+                // 🎯 SKILL BARS FIX - ADD THIS CALL
+                setTimeout(() => {
+                    animateSkillBars();
+                }, 200);
+            }, 500);
         }
         loaderPercentage.textContent = Math.floor(progress) + '%';
     }, 150);
@@ -306,108 +306,6 @@ function init3DBackground() {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
-// SIMPLE SOLUTION - FormSubmit.co Ko Completely Avoid Karein
-document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.getElementById('contactForm');
-    
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const submitButton = contactForm.querySelector('.submit-button');
-            const originalText = submitButton.innerHTML;
-            
-            // Show loading
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            submitButton.disabled = true;
-            
-            // Form data
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                message: document.getElementById('message').value
-            };
-            
-            // Simulate sending (2 seconds)
-            setTimeout(() => {
-                // SUCCESS - User ko success dikhao
-                showNotification('✅ Message sent successfully! I will email you back soon.', 'success');
-                
-                // Form reset
-                contactForm.reset();
-                submitButton.innerHTML = originalText;
-                submitButton.disabled = false;
-                
-                // Data console mein dikhao (development ke liye)
-                console.log('📧 FORM DATA:', formData);
-                console.log('📨 This would be emailed to: abhi26ku@gmail.com');
-                
-                // Optional: Data download karne ka option
-                const dataStr = "Name: " + formData.name + "\nEmail: " + formData.email + "\nMessage: " + formData.message;
-                const blob = new Blob([dataStr], { type: 'text/plain' });
-                
-            }, 2000);
-        });
-    }
-    
-    function showNotification(message, type) {
-        const existing = document.querySelectorAll('.form-notification');
-        existing.forEach(el => el.remove());
-        
-        const notification = document.createElement('div');
-        notification.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 12px; padding: 16px 20px; 
-                       background: #10b981; color: white; border-radius: 10px; 
-                       box-shadow: 0 8px 25px rgba(0,0,0,0.3); border-left: 4px solid #059669;">
-                <i class="fas fa-check-circle" style="font-size: 18px;"></i>
-                <span style="font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 14px;">
-                    ${message}
-                </span>
-            </div>
-        `;
-        
-        notification.style.cssText = `
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            z-index: 10000;
-            animation: slideInRight 0.4s ease;
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.4s ease';
-            setTimeout(() => notification.remove(), 400);
-        }, 5000);
-    }
-});
-// CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    .submit-button:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-    .fa-spinner {
-        animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-`;
-document.head.appendChild(style);
-
-console.log('✅ Contact Form Loaded - No Redirect Guaranteed');
 }
 
 // ==========================================
@@ -434,18 +332,17 @@ function initAnimations() {
     });
     
     // Animate skill cards with stagger
-    // Animate skill cards with stagger (without affecting progress bars)
-gsap.from('.skill-card', {
-    scrollTrigger: {
-        trigger: '.skills-grid',
-        start: 'top 70%'
-    },
-    y: 100,
-    opacity: 0,
-    duration: 0.8,
-    stagger: 0.2,
-    ease: 'back.out(1.7)'
-});
+    gsap.from('.skill-card', {
+        scrollTrigger: {
+            trigger: '.skills-grid',
+            start: 'top 70%'
+        },
+        y: 100,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: 'back.out(1.7)'
+    });
     
     // Animate project cards with 3D effect
     gsap.utils.toArray('.project-card').forEach(card => {
@@ -519,6 +416,7 @@ function animateSkillBars() {
         });
     }, 300);
 }
+
 // ==========================================
 // 3D TILT EFFECT FOR CARDS
 // ==========================================
@@ -544,101 +442,8 @@ function init3DTilt() {
             card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
         });
     });
-}// ==========================================
-// CONTACT FORM - FORMSUBMIT.CO SOLUTION
-// ==========================================
-
-const contactForm = document.getElementById('contactForm');
-
-contactForm.addEventListener('submit', function(e) {
-    // Form automatically FormSubmit.co को submit हो जाएगा
-    // हमें सिर्फ loading state manage करना है
-    
-    const submitButton = contactForm.querySelector('.submit-button');
-    const originalText = submitButton.innerHTML;
-    
-    // Show loading state
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending Message...</span>';
-    submitButton.disabled = true;
-    submitButton.style.background = '#ff6b35';
-    
-    // FormSubmit.co automatically process करेगा
-    // Success message show करें
-    setTimeout(() => {
-        submitButton.innerHTML = '<i class="fas fa-check-circle"></i> <span>Message Sent!</span>';
-        submitButton.style.background = '#10b981';
-        
-        showNotification('✅ Message sent successfully! I will reply to you soon.', 'success');
-        
-        // Reset form after success
-        setTimeout(() => {
-            contactForm.reset();
-            submitButton.innerHTML = originalText;
-            submitButton.style.background = '';
-            submitButton.disabled = false;
-        }, 3000);
-        
-    }, 2000);
-});
-
-function showNotification(message, type) {
-    const existing = document.querySelectorAll('.form-notify');
-    existing.forEach(el => el.remove());
-    
-    const notification = document.createElement('div');
-    notification.className = 'form-notify';
-    notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        padding: 20px 25px;
-        background: ${type === 'success' ? '#10b981' : '#ef4444'};
-        color: white;
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        z-index: 10000;
-        font-family: 'Rajdhani', sans-serif;
-        font-weight: 600;
-        font-size: 15px;
-        max-width: 400px;
-        border-left: 5px solid ${type === 'success' ? '#059669' : '#dc2626'};
-        animation: slideInRight 0.4s ease;
-    `;
-    
-    notification.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}" style="font-size: 18px;"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.4s ease';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.remove();
-            }
-        }, 400);
-    }, 5000);
 }
 
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
-
-console.log('✅ FormSubmit.co contact form loaded');
 // ==========================================
 // CURSOR TRAIL EFFECT
 // ==========================================
@@ -734,90 +539,156 @@ function initFloatingAnimation() {
         element.style.animation = `float ${randomDuration}s ease-in-out ${randomDelay}s infinite`;
     });
 }
-
 // ==========================================
-// INITIALIZE ALL FEATURES
+// CONTACT FORM - WORKING SOLUTION WITH FORMSUBMIT.CO
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize particles background
-    setTimeout(initParticles, 100);
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
     
-    // Initialize 3D background
-    setTimeout(init3DBackground, 200);
-    
-    // Initialize 3D tilt effect
-    setTimeout(init3DTilt, 400);
-    
-    // Initialize cursor trail
-    setTimeout(initCursorTrail, 500);
-    
-    // Initialize scroll reveal
-    setTimeout(initScrollReveal, 600);
-    
-    // Initialize floating animation
-    setTimeout(initFloatingAnimation, 700);
-    
-    // 🎯 SKILL BARS WILL BE CALLED FROM window.load (Line 30)
-});
-// ==========================================
-// PERFORMANCE OPTIMIZATION
-// ==========================================
-// Debounce function for scroll events
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Optimize scroll events
-const optimizedScroll = debounce(() => {
-    // Additional scroll optimizations can be added here
-}, 10);
-
-window.addEventListener('scroll', optimizedScroll);
-
-// ==========================================
-// EASTER EGG: KONAMI CODE
-// ==========================================
-const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-let konamiIndex = 0;
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === konamiCode[konamiIndex]) {
-        konamiIndex++;
-        if (konamiIndex === konamiCode.length) {
-            activateEasterEgg();
-            konamiIndex = 0;
+    if (contactForm) {
+        // Set the redirect URL to current page (stay on same page)
+        const nextUrlInput = contactForm.querySelector('input[name="_next"]');
+        if (nextUrlInput) {
+            nextUrlInput.value = window.location.href;
         }
-    } else {
-        konamiIndex = 0;
+        
+        contactForm.addEventListener('submit', function(e) {
+            // Don't prevent default - let form submit naturally
+            // We'll just add loading state and success handling
+            
+            const submitButton = contactForm.querySelector('.submit-button');
+            const originalHTML = submitButton.innerHTML;
+            
+            // Form validation
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            if (!name || !email || !message) {
+                e.preventDefault();
+                showNotification('❌ Please fill all fields', 'error');
+                return false;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                e.preventDefault();
+                showNotification('❌ Please enter a valid email address', 'error');
+                return false;
+            }
+            
+            // Show loading state
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitButton.disabled = true;
+            
+            // Store form data for potential resubmission
+            const formData = {
+                name: name,
+                email: email,
+                message: message
+            };
+            
+            console.log('📧 Form Data Prepared:', formData);
+            
+            // The form will now submit naturally to FormSubmit.co
+            // We'll rely on FormSubmit's redirect back to our page
+            
+            // Add a safety timeout to re-enable button (in case submission fails)
+            setTimeout(() => {
+                submitButton.innerHTML = originalHTML;
+                submitButton.disabled = false;
+            }, 10000);
+            
+            return true;
+        });
+        
+        // Check if we're returning from a successful form submission
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success') && urlParams.get('success') === 'true') {
+            showNotification('✅ Message sent successfully! I will reply within 24 hours.', 'success');
+            
+            // Clean URL (remove success parameter)
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+        }
+    }
+    
+    function showNotification(message, type) {
+        // Remove existing notifications
+        const existing = document.querySelectorAll('.form-notification');
+        existing.forEach(el => el.remove());
+        
+        const bgColor = type === 'success' ? '#10b981' : '#ef4444';
+        const borderColor = type === 'success' ? '#059669' : '#dc2626';
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        const notification = document.createElement('div');
+        notification.className = 'form-notification';
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; padding: 16px 20px; 
+                       background: ${bgColor}; color: white; border-radius: 10px; 
+                       box-shadow: 0 8px 25px rgba(0,0,0,0.3); border-left: 4px solid ${borderColor};">
+                <i class="fas ${icon}" style="font-size: 18px;"></i>
+                <span style="font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 14px;">
+                    ${message}
+                </span>
+            </div>
+        `;
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 10000;
+            animation: slideInRight 0.4s ease;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.4s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 400);
+        }, 5000);
     }
 });
 
-function activateEasterEgg() {
-    document.body.style.animation = 'rainbow 2s linear infinite';
-    
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @keyframes rainbow {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
-        }
-    `;
-    document.head.appendChild(style);
-    
+// Add CSS animations for notifications
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    .submit-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+    .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(style);
     setTimeout(() => {
         document.body.style.animation = '';
     }, 5000);
     
     console.log('🎉 Easter Egg Activated! You found the secret!');
-}
+
 
 // ==========================================
 // LOG WELCOME MESSAGE

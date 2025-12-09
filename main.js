@@ -21,11 +21,6 @@ window.addEventListener('load', () => {
                 loader.classList.add('hidden');
                 document.body.style.overflow = 'visible';
                 initAnimations();
-                
-                // 🎯 SKILL BARS FIX - ADD THIS CALL
-                setTimeout(() => {
-                    animateSkillBars();
-                }, 200);
             }, 500);
         }
         loaderPercentage.textContent = Math.floor(progress) + '%';
@@ -306,6 +301,16 @@ function init3DBackground() {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
+    
+    // Mouse parallax effect
+    document.addEventListener('mousemove', (e) => {
+        const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        const mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        
+        camera.position.x = mouseX * 5;
+        camera.position.y = mouseY * 5;
+        camera.lookAt(scene.position);
+    });
 }
 
 // ==========================================
@@ -383,38 +388,39 @@ function initAnimations() {
         });
     });
 }
-
-// ==========================================
-// SKILL PROGRESS BARS - GUARANTEED WORKING
-// ==========================================
 function animateSkillBars() {
-    console.log('🎯 Initializing skill bars...');
+    const skillBars = document.querySelectorAll('.skill-progress');
     
-    // Wait for DOM to be ready
-    setTimeout(() => {
-        const skillBars = document.querySelectorAll('.skill-progress');
-        console.log(`📊 Found ${skillBars.length} skill bars`);
-        
-        // Set widths directly with visual force
-        const widths = [85, 80, 90, 88, 75];
-        
-        skillBars.forEach((bar, index) => {
-            if (widths[index]) {
-                // Force visual update
-                bar.style.cssText = `
-                    width: ${widths[index]}% !important;
-                    height: 100% !important;
-                    opacity: 1 !important;
-                    visibility: visible !important;
-                    display: block !important;
-                    background: linear-gradient(90deg, #ff006e, #ff1f8f) !important;
-                    box-shadow: 0 0 15px rgba(255, 0, 110, 0.5) !important;
-                    border-radius: 5px !important;
-                `;
-                console.log(`✅ Set skill bar ${index + 1} to ${widths[index]}%`);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const progress = entry.target.getAttribute('data-progress');
+                entry.target.style.width = progress + '%';
+                entry.target.classList.add('animated');
+                
+                // Percentage text update
+                const percentageElement = entry.target.closest('.skill-card').querySelector('.skill-percentage');
+                let currentPercent = 0;
+                const interval = setInterval(() => {
+                    if (currentPercent >= parseInt(progress)) {
+                        clearInterval(interval);
+                    } else {
+                        currentPercent++;
+                        percentageElement.textContent = currentPercent + '%';
+                    }
+                }, 15);
             }
         });
-    }, 300);
+    }, {
+        threshold: 0.3,
+        rootMargin: '0px 0px -50px 0px'
+    });
+    
+    skillBars.forEach((bar) => {
+        // Reset width initially
+        bar.style.width = '0%';
+        observer.observe(bar);
+    });
 }
 
 // ==========================================
@@ -441,102 +447,6 @@ function init3DTilt() {
         card.addEventListener('mouseleave', () => {
             card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
         });
-    });
-}
-
-// ==========================================
-// CURSOR TRAIL EFFECT
-// ==========================================
-function initCursorTrail() {
-    const coords = { x: 0, y: 0 };
-    const circles = document.querySelectorAll('.cursor-circle');
-    
-    // Create cursor trail circles
-    if (circles.length === 0 && window.innerWidth > 768) {
-        for (let i = 0; i < 20; i++) {
-            const circle = document.createElement('div');
-            circle.className = 'cursor-circle';
-            circle.style.cssText = `
-                position: fixed;
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                background: rgba(255, 0, 110, 0.5);
-                pointer-events: none;
-                z-index: 9999;
-                transition: transform 0.3s ease;
-            `;
-            document.body.appendChild(circle);
-        }
-    }
-    
-    const circleElements = document.querySelectorAll('.cursor-circle');
-    
-    document.addEventListener('mousemove', (e) => {
-        coords.x = e.clientX;
-        coords.y = e.clientY;
-    });
-    
-    function animateCircles() {
-        let x = coords.x;
-        let y = coords.y;
-        
-        circleElements.forEach((circle, index) => {
-            circle.style.left = x - 5 + 'px';
-            circle.style.top = y - 5 + 'px';
-            circle.style.transform = `scale(${(circleElements.length - index) / circleElements.length})`;
-            
-            const nextCircle = circleElements[index + 1] || circleElements[0];
-            x += (parseInt(nextCircle.style.left) || coords.x - 5 - x) * 0.3;
-            y += (parseInt(nextCircle.style.top) || coords.y - 5 - y) * 0.3;
-        });
-        
-        requestAnimationFrame(animateCircles);
-    }
-    
-    if (window.innerWidth > 768) {
-        animateCircles();
-    }
-}
-
-// ==========================================
-// SCROLL REVEAL ANIMATIONS
-// ==========================================
-function initScrollReveal() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-    
-    const elements = document.querySelectorAll('.info-card, .contact-card, .experience-card');
-    elements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(50px)';
-        el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        observer.observe(el);
-    });
-}
-
-// ==========================================
-// FLOATING ANIMATION FOR HERO ELEMENTS
-// ==========================================
-function initFloatingAnimation() {
-    const floatingElements = document.querySelectorAll('.floating-card, .hero-3d-model');
-    
-    floatingElements.forEach((element, index) => {
-        const randomDelay = index * 0.5;
-        const randomDuration = 3 + Math.random() * 2;
-        
-        element.style.animation = `float ${randomDuration}s ease-in-out ${randomDelay}s infinite`;
     });
 }
 // ==========================================
@@ -655,40 +565,217 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 400);
         }, 5000);
+       
+};
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+// ==========================================
+// CURSOR TRAIL EFFECT
+// ==========================================
+function initCursorTrail() {
+    const coords = { x: 0, y: 0 };
+    const circles = document.querySelectorAll('.cursor-circle');
+    
+    // Create cursor trail circles
+    if (circles.length === 0 && window.innerWidth > 768) {
+        for (let i = 0; i < 20; i++) {
+            const circle = document.createElement('div');
+            circle.className = 'cursor-circle';
+            circle.style.cssText = `
+                position: fixed;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: rgba(255, 0, 110, 0.5);
+                pointer-events: none;
+                z-index: 9999;
+                transition: transform 0.3s ease;
+            `;
+            document.body.appendChild(circle);
+        }
+    }
+    
+    const circleElements = document.querySelectorAll('.cursor-circle');
+    
+    document.addEventListener('mousemove', (e) => {
+        coords.x = e.clientX;
+        coords.y = e.clientY;
+    });
+    
+    function animateCircles() {
+        let x = coords.x;
+        let y = coords.y;
+        
+        circleElements.forEach((circle, index) => {
+            circle.style.left = x - 5 + 'px';
+            circle.style.top = y - 5 + 'px';
+            circle.style.transform = `scale(${(circleElements.length - index) / circleElements.length})`;
+            
+            const nextCircle = circleElements[index + 1] || circleElements[0];
+            x += (parseInt(nextCircle.style.left) || coords.x - 5 - x) * 0.3;
+            y += (parseInt(nextCircle.style.top) || coords.y - 5 - y) * 0.3;
+        });
+        
+        requestAnimationFrame(animateCircles);
+    }
+    
+    if (window.innerWidth > 768) {
+        animateCircles();
+    }
+}
+
+// ==========================================
+// SCROLL REVEAL ANIMATIONS
+// ==========================================
+function initScrollReveal() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    const elements = document.querySelectorAll('.info-card, .contact-card, .experience-card');
+    elements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(50px)';
+        el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        observer.observe(el);
+    });
+}
+
+// ==========================================
+// FLOATING ANIMATION FOR HERO ELEMENTS
+// ==========================================
+function initFloatingAnimation() {
+    const floatingElements = document.querySelectorAll('.floating-card, .hero-3d-model');
+    
+    floatingElements.forEach((element, index) => {
+        const randomDelay = index * 0.5;
+        const randomDuration = 3 + Math.random() * 2;
+        
+        element.style.animation = `float ${randomDuration}s ease-in-out ${randomDelay}s infinite`;
+    });
+}
+
+// ==========================================
+// INITIALIZE ALL FEATURES
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize particles background
+    setTimeout(initParticles, 100);
+    
+    // Initialize 3D background
+    setTimeout(init3DBackground, 200);
+    
+    // Initialize skill bars animation
+    setTimeout(animateSkillBars, 300);
+    
+    // Initialize 3D tilt effect
+    setTimeout(init3DTilt, 400);
+    
+    // Initialize cursor trail
+    setTimeout(initCursorTrail, 500);
+    
+    // Initialize scroll reveal
+    setTimeout(initScrollReveal, 600);
+    
+    // Initialize floating animation
+    setTimeout(initFloatingAnimation, 700);
+});
+
+// ==========================================
+// PERFORMANCE OPTIMIZATION
+// ==========================================
+// Debounce function for scroll events
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Optimize scroll events
+const optimizedScroll = debounce(() => {
+    // Additional scroll optimizations can be added here
+}, 10);
+
+window.addEventListener('scroll', optimizedScroll);
+
+// ==========================================
+// EASTER EGG: KONAMI CODE
+// ==========================================
+const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+let konamiIndex = 0;
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === konamiCode[konamiIndex]) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+            activateEasterEgg();
+            konamiIndex = 0;
+        }
+    } else {
+        konamiIndex = 0;
     }
 });
 
-// Add CSS animations for notifications
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    .submit-button:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-        transform: none !important;
-    }
-    .fa-spinner {
-        animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-`;
-document.head.appendChild(style);
+function activateEasterEgg() {
+    document.body.style.animation = 'rainbow 2s linear infinite';
+    
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+    
     setTimeout(() => {
         document.body.style.animation = '';
     }, 5000);
     
     console.log('🎉 Easter Egg Activated! You found the secret!');
-
+}
 
 // ==========================================
 // LOG WELCOME MESSAGE

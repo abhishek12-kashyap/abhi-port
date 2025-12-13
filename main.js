@@ -111,7 +111,8 @@ const texts = [
     'Full-Stack Learner',
     '2+ Years Experience in Programming',
     'Creative Problem Solver',
-    'Passionate Developer'
+    'Passionate Developer',
+    'Frontend Developer'
 ];
 let textIndex = 0;
 let charIndex = 0;

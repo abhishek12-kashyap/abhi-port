@@ -796,26 +796,23 @@ if (typeof module !== 'undefined' && module.exports) {
         animateSkillBars,
         init3DTilt
     };
-}
-// ==========================================
-// ENHANCED CURSOR TRAIL WITH GLOW
+}// ==========================================
+// FAST CURSOR TRAIL (Updated)
 // ==========================================
 function initCursorTrail() {
-    // Agar screen chhoti hai toh effect disable karein
     if (window.innerWidth <= 768) return;
 
     const circles = [];
-    const numCircles = 15; // trail ki length
+    const numCircles = 12;
 
-    // Create trail circles
     for (let i = 0; i < numCircles; i++) {
         const circle = document.createElement('div');
         circle.className = 'cursor-circle';
-        const size = 20 - (i * 1.2); // gradually chhota
+        const size = 20 - (i * 1.5);
         circle.style.width = size + 'px';
         circle.style.height = size + 'px';
-        circle.style.opacity = 0.8 - (i * 0.05);
-        circle.style.transition = 'all 0.1s ease';
+        circle.style.opacity = 0.8 - (i * 0.06);
+        circle.style.transition = 'all 0.05s ease'; // transition bhi fast
         document.body.appendChild(circle);
         circles.push(circle);
     }
@@ -823,24 +820,21 @@ function initCursorTrail() {
     let mouseX = 0, mouseY = 0;
     let currentX = 0, currentY = 0;
 
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-
-        // Main circle ko thoda highlight karein
-        circles[0].style.transform = `translate(-50%, -50%) scale(1.2)`;
-        circles[0].style.background = `radial-gradient(circle, rgba(255, 0, 110, 1), rgba(255, 0, 110, 0.2))`;
-        setTimeout(() => {
-            circles[0].style.transform = `translate(-50%, -50%) scale(1)`;
-            circles[0].style.background = `radial-gradient(circle, rgba(255, 0, 110, 0.8), rgba(255, 0, 110, 0))`;
-        }, 100);
-    });
-
-    // Smooth follow with lerp
+   // Pehle yeh tha: camera.position.x = mouseX * 5;
+// Ab isko fast aur responsive banao:
+document.addEventListener('mousemove', (e) => {
+    const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+    const mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+    
+    // ⚡ MULTIPLIER BADHAYA (5 → 20) aur smoothing hata di (instant response)
+    camera.position.x = mouseX * 20;
+    camera.position.y = mouseY * 20;
+    camera.lookAt(scene.position);
+});
     function animateTrail() {
-        // lerp (linear interpolation) for smoothness
-        currentX += (mouseX - currentX) * 0.3;
-        currentY += (mouseY - currentY) * 0.3;
+        // ⚡ SPEED UP: 0.3 → 0.8 (Cursor turant pahunchta hai)
+        currentX += (mouseX - currentX) * 0.8;
+        currentY += (mouseY - currentY) * 0.8;
 
         let x = currentX;
         let y = currentY;
@@ -849,43 +843,20 @@ function initCursorTrail() {
             circle.style.left = x + 'px';
             circle.style.top = y + 'px';
 
-            // Next circle ko thoda piche karo
             const next = circles[index + 1] || circles[0];
             const nextX = parseFloat(next.style.left) || x;
             const nextY = parseFloat(next.style.top) || y;
-            x += (nextX - x) * 0.35;
-            y += (nextY - y) * 0.35;
+            
+            // ⚡ TRAIL FOLLOW: 0.35 → 0.7 (Piche wale circles bhi tez aate hain)
+            x += (nextX - x) * 0.7;
+            y += (nextY - y) * 0.7;
         });
 
         requestAnimationFrame(animateTrail);
     }
-
     animateTrail();
 
-    // Mouse click pe ripple effect trigger karein
     document.addEventListener('mousedown', (e) => {
         createRipple(e.clientX, e.clientY);
     });
 }
-
-// ==========================================
-// RIPPLE EFFECT ON CLICK/DRAG
-// ==========================================
-function createRipple(x, y) {
-    const ripple = document.createElement('div');
-    ripple.className = 'ripple-effect';
-    ripple.style.left = x + 'px';
-    ripple.style.top = y + 'px';
-    document.body.appendChild(ripple);
-
-    // Ripple ko hatayein animation ke baad
-    setTimeout(() => {
-        ripple.remove();
-    }, 800);
-}
-
-// Call karein DOM load par
-document.addEventListener('DOMContentLoaded', () => {
-    // ... aapke existing code ke saath
-    initCursorTrail();
-});

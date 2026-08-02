@@ -2325,48 +2325,52 @@ html, body {
     0% { left: -100%; }
     100% { left: 100%; }
 }
-/* ==========================================
-   CURSOR TRAIL & GLOW EFFECT
-   ========================================== */
-.cursor-circle {
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 0, 110, 0.8), rgba(255, 0, 110, 0));
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: width 0.3s, height 0.3s;
-    mix-blend-mode: screen;
+/* ====== CURSOR MAGIC - WORKING ====== */
+.magic-cursor {
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff006e, rgba(255, 0, 110, 0.2));
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background 0.2s;
+  box-shadow: 0 0 30px rgba(255, 0, 110, 0.6);
+  mix-blend-mode: screen;
 }
 
-.cursor-circle.active {
-    width: 80px;
-    height: 80px;
-    opacity: 0.5;
+.magic-trail {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 0, 110, 0.4);
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: all 0.05s ease;
 }
 
-/* Ripple effect on click */
-.ripple-effect {
-    position: fixed;
-    border: 3px solid var(--neon-pink);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    animation: rippleAnim 0.8s ease-out forwards;
+.magic-ripple {
+  position: fixed;
+  border: 3px solid #ff006e;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99997;
+  transform: translate(-50%, -50%);
+  animation: rippleAnim 0.7s ease-out forwards;
 }
 
 @keyframes rippleAnim {
-    0% {
-        width: 0;
-        height: 0;
-        opacity: 1;
-    }
-    100% {
-        width: 300px;
-        height: 300px;
-        opacity: 0;
-    }
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 250px;
+    height: 250px;
+    opacity: 0;
+  }
 }

@@ -860,3 +860,99 @@ document.addEventListener('mousemove', (e) => {
         createRipple(e.clientX, e.clientY);
     });
 }
+// ==========================================
+// ✅ WORKING CURSOR ANIMATION - INDEPENDENT
+// ==========================================
+(function initMagicCursor() {
+  // Mobile par disable
+  if (window.innerWidth <= 768) return;
+
+  // ---- 1. Main cursor ----
+  const cursor = document.createElement('div');
+  cursor.className = 'magic-cursor';
+  document.body.appendChild(cursor);
+
+  // ---- 2. Trail circles (12 pieces) ----
+  const trail = [];
+  for (let i = 0; i < 12; i++) {
+    const el = document.createElement('div');
+    el.className = 'magic-trail';
+    const size = 12 - i * 0.8;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.opacity = 0.7 - i * 0.05;
+    document.body.appendChild(el);
+    trail.push(el);
+  }
+
+  let mx = 0, my = 0;
+  let cx = 0, cy = 0;
+
+  // ---- 3. Mouse move ----
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX;
+    my = e.clientY;
+
+    // Main cursor ko thoda zoom effect
+    cursor.style.width = '40px';
+    cursor.style.height = '40px';
+    cursor.style.background = 'radial-gradient(circle, #ff006e, rgba(255,0,110,0.1))';
+    clearTimeout(cursor._timer);
+    cursor._timer = setTimeout(() => {
+      cursor.style.width = '30px';
+      cursor.style.height = '30px';
+      cursor.style.background = 'radial-gradient(circle, #ff006e, rgba(255,0,110,0.2))';
+    }, 150);
+  });
+
+  // ---- 4. Animation loop (fast lerp) ----
+  function anim() {
+    // Fast follow
+    cx += (mx - cx) * 0.85;
+    cy += (my - cy) * 0.85;
+
+    // Main cursor position
+    cursor.style.left = cx + 'px';
+    cursor.style.top = cy + 'px';
+
+    // Trail positions
+    let x = cx, y = cy;
+    trail.forEach((el, i) => {
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      const next = trail[i + 1] || trail[0];
+      const nx = parseFloat(next.style.left) || x;
+      const ny = parseFloat(next.style.top) || y;
+      x += (nx - x) * 0.65;
+      y += (ny - y) * 0.65;
+    });
+
+    requestAnimationFrame(anim);
+  }
+  anim();
+
+  // ---- 5. Click ripple ----
+  document.addEventListener('mousedown', (e) => {
+    const ripple = document.createElement('div');
+    ripple.className = 'magic-ripple';
+    ripple.style.left = e.clientX + 'px';
+    ripple.style.top = e.clientY + 'px';
+    document.body.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 800);
+  });
+
+  // ---- 6. 3D Parallax for hero (if three-container exists) ----
+  const container = document.getElementById('three-container');
+  if (container && container._scene && container._camera) {
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = -(e.clientY / window.innerHeight) * 2 + 1;
+      container._camera.position.x = x * 25;
+      container._camera.position.y = y * 25;
+      container._camera.lookAt(container._scene.position);
+    });
+  }
+})();
+const container = document.getElementById('three-container');
+container._scene = scene;
+container._camera = camera;
